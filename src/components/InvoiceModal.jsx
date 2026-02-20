@@ -30,7 +30,7 @@ export default function InvoiceModal({ isOpen, onClose, sale }) {
                 <Calendar size={12} /> {new Date().toLocaleDateString()}
               </span>
               <span className="flex items-center gap-1">
-                <User size={12} /> {sale.user_id?.slice(0, 8)}
+                <User size={12} /> 
               </span>
             </div>
           </div>

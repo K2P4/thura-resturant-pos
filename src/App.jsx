@@ -7,6 +7,7 @@ import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Users from './pages/Users';
 import POS from './pages/POS';
+import Tables from './pages/Tables';
 import Reports from './pages/Reports';
 import { Toaster } from './components/ui/Sonner';
 import MainLayout from './layout/MainLayout';
@@ -21,8 +22,9 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
-              <Route path="/" element={<Navigate to="/pos" replace />} />
-              <Route path="/pos" element={<POS />} />
+              <Route path="/" element={<Navigate to="/tables" replace />} />
+              <Route path="/tables" element={<Tables />} />
+              <Route path="/pos/:tableId" element={<POS />} />
               <Route path="/products" element={<Products />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/users" element={<Users />} />

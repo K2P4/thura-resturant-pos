@@ -1,13 +1,17 @@
 import { Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProductCard({ product, handleOpenModal, handleDelete, isProduct = false, addToCart }) {
+  const {user}  = useAuth();
   const handleCardClick = () => {
     if (!isProduct && addToCart) {
       addToCart(product);
     }
   };
+
+  console.log(user?.user_metadata);
 
   return (
     <Card
@@ -24,7 +28,7 @@ export default function ProductCard({ product, handleOpenModal, handleDelete, is
         <div className="flex items-center justify-between">
           <span className="text-xl font-bold text-primary/90">{product.price.toLocaleString()} ကျပ်</span>
 
-          {isProduct && (
+          {isProduct && user?.user_metadata?.role === 'admin' && (
             <div className="flex gap-1">
               <Button size="icon" variant="icon" onClick={() => handleOpenModal(product)} className="text-blue-600 hover:bg-blue-50 rounded-full">
                 <Pencil className="h-4 w-4" />

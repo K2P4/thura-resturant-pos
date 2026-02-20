@@ -1,15 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FileText, LayoutDashboard, Package, ShoppingCart, Users, LogOut, UtensilsCrossed, X } from 'lucide-react';
+import { FileText, LayoutGrid, Package, Users, LogOut, UtensilsCrossed, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { Button } from './ui/Button';
 
 const navItems = [
   {
-    to: '/pos',
-    icon: ShoppingCart,
-    label: 'အရောင်း (POS)',
+    to: '/tables',
+    icon: UtensilsCrossed,
+    label: 'စားပွဲဝိုင်းများ',
   },
   {
     to: '/products',
@@ -18,7 +18,7 @@ const navItems = [
   },
   {
     to: '/categories',
-    icon: LayoutDashboard,
+    icon: LayoutGrid,
     label: 'အမျိုးအစားများ',
   },
   {

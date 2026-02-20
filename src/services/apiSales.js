@@ -1,33 +1,59 @@
 import { supabase } from './supabase';
+import { insertSaleItems, upsertSaleItems } from './apiSaleItems';
+import { setTableOccupied } from './apiTables';
 
-export async function createSale({ items, totalAmount, userId, paymentMethod = 'cash' }) {
-  const { data: saleData, error: saleError } = await supabase
+export async function getPendingSaleByTable(tableId) {
+  const { data, error } = await supabase.from('sales').select('*, sale_items(*, products(*))').eq('table_id', tableId).eq('status', 'pending').maybeSingle();
+
+  if (error) throw new Error('Could not fetch pending sale');
+  return data;
+}
+
+export async function createPendingSale({ tableId, items, totalAmount }) {
+  const { data: sale, error } = await supabase
     .from('sales')
     .insert([
       {
+        table_id: tableId,
         total_amount: totalAmount,
-        user_id: userId,
-        payment_method: paymentMethod,
+        status: 'pending',
+        payment_method: 'cash',
       },
     ])
     .select()
     .single();
 
-  if (saleError) {
-    throw new Error('Sale could not be created');
-  }
+  if (error) throw new Error('Sale could not be created');
 
-  const saleItems = items.map((item) => ({
-    sale_id: saleData.id,
-    product_id: item.id,
-    quantity: item.quantity,
-  }));
+  await insertSaleItems(sale.id, items);
+  await setTableOccupied(tableId, true);
 
-  const { error: itemsError } = await supabase.from('sale_items').insert(saleItems);
+  return { ...sale, items };
+}
 
-  if (itemsError) {
-    throw new Error('Sale items could not be created');
-  }
+export async function updatePendingSale({ saleId, items, totalAmount }) {
+  const { error } = await supabase.from('sales').update({ total_amount: totalAmount }).eq('id', saleId);
 
-  return { ...saleData, items: items };
+  if (error) throw new Error('Sale total could not be updated');
+
+  await upsertSaleItems(saleId, items);
+}
+
+export async function completeSale({ saleId, tableId, totalAmount, paymentMethod = 'cash' }) {
+  const { data: sale, error } = await supabase
+    .from('sales')
+    .update({
+      status: 'completed',
+      total_amount: totalAmount,
+      payment_method: paymentMethod,
+    })
+    .eq('id', saleId)
+    .select()
+    .single();
+
+  if (error) throw new Error('Sale could not be completed');
+
+  await setTableOccupied(tableId, false);
+
+  return sale;
 }
